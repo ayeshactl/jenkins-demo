@@ -3,7 +3,7 @@ pipeline {
 
     stages {
 
-        stage('Checkout Code') {
+        stage('Checkout') {
             steps {
                 git 'https://github.com/ayeshactl/jenkins-demo.git'
             }
@@ -17,51 +17,27 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t app-image .'
+                sh 'docker build -t maven-app-image .'
             }
         }
 
         stage('Deploy Container') {
             steps {
                 sh '''
-                docker stop app-container || true
-                docker rm app-container || true
-                docker run -d --name app-container -p 80:8080 app-image
+                docker stop maven-app || true
+                docker rm maven-app || true
+                docker run -d --name maven-app -p 80:8080 maven-app-image
                 '''
             }
         }
     }
-}pipeline {
-    agent any
 
-    stages {
-
-        stage('Checkout Code') {
-            steps {
-                git 'https://github.com/ayeshactl/jenkins-demo.git'
-            }
+    post {
+        success {
+            echo "✅ SUCCESS"
         }
-
-        stage('Build Maven') {
-            steps {
-                sh 'mvn clean package'
-            }
-        }
-
-        stage('Build Docker Image') {
-            steps {
-                sh 'docker build -t app-image .'
-            }
-        }
-
-        stage('Deploy Container') {
-            steps {
-                sh '''
-                docker stop app-container || true
-                docker rm app-container || true
-                docker run -d --name app-container -p 80:8080 app-image
-                '''
-            }
+        failure {
+            echo "❌ FAILED"
         }
     }
 }
