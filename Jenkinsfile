@@ -11,7 +11,7 @@ pipeline {
         stage('Checkout Code') {
             steps {
                 echo 'Cloning Git repository...'
-                git url: 'https://github.com/YOUR_USERNAME/jenkins-demo.git', branch: 'main'
+                git url: 'https://github.com/ayeshactl/jenkins-demo.git', branch: 'main'
             }
         }
 
