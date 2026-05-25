@@ -6,8 +6,7 @@ pipeline {
         stage('Checkout Code') {
             steps {
                 echo 'Cloning Git repository...'
-                git 'https://github.com/ayeshactl/jenkins-demo.git'
-            }
+git branch: 'main', url: 'https://github.com/ayeshactl/jenkins-demo.git'            }
         }
 
         stage('Build Maven Project') {
