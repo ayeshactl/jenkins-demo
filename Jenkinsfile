@@ -5,7 +5,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git 'https://github.com/ayeshactl/jenkins-demo.git'
+                git branch: 'main', url: 'https://github.com/ayeshactl/jenkins-demo.git'
             }
         }
 
@@ -15,29 +15,20 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Docker Build') {
             steps {
                 sh 'docker build -t maven-app-image .'
             }
         }
 
-        stage('Deploy Container') {
+        stage('Deploy') {
             steps {
                 sh '''
                 docker stop maven-app || true
                 docker rm maven-app || true
-                docker run -d --name maven-app -p 80:8080 maven-app-image
+                docker run -d -p 8081:8080 --name maven-app maven-app-image
                 '''
             }
-        }
-    }
-
-    post {
-        success {
-            echo "✅ SUCCESS"
-        }
-        failure {
-            echo "❌ FAILED"
         }
     }
 }
