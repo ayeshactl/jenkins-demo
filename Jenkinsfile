@@ -1,17 +1,12 @@
 pipeline {
     agent any
 
-    environment {
-        APP_NAME = "maven-app"
-        IMAGE_NAME = "maven-app-image"
-    }
-
     stages {
 
         stage('Checkout Code') {
             steps {
                 echo 'Cloning Git repository...'
-                git url: 'https://github.com/ayeshactl/jenkins-demo.git', branch: 'main'
+                git 'https://github.com/ayeshactl/jenkins-demo.git'
             }
         }
 
@@ -22,27 +17,21 @@ pipeline {
             }
         }
 
-        stage('Check Target Jar') {
-            steps {
-                echo 'Verifying build output...'
-                sh 'ls -l target/'
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
                 echo 'Building Docker image...'
-                sh 'docker build -t $IMAGE_NAME .'
+                sh 'docker build -t maven-app-image .'
             }
         }
 
         stage('Run Docker Container') {
             steps {
                 echo 'Running Docker container...'
+
                 sh '''
-                    docker stop $APP_NAME || true
-                    docker rm $APP_NAME || true
-                    docker run -d --name $APP_NAME -p 8080:8080 $IMAGE_NAME
+                docker stop maven-app || true
+                docker rm maven-app || true
+                docker run -d --name maven-app -p 8081:8080 maven-app-image
                 '''
             }
         }
@@ -50,10 +39,10 @@ pipeline {
 
     post {
         success {
-            echo '✅ Pipeline SUCCESS — App is running!'
+            echo '✅ Pipeline SUCCESS'
         }
         failure {
-            echo '❌ Pipeline FAILED — check logs'
+            echo '❌ Pipeline FAILED'
         }
     }
 }
