@@ -5,43 +5,63 @@ pipeline {
 
         stage('Checkout Code') {
             steps {
-                echo 'Cloning Git repository...'
-git branch: 'main', url: 'https://github.com/ayeshactl/jenkins-demo.git'            }
+                git 'https://github.com/ayeshactl/jenkins-demo.git'
+            }
         }
 
-        stage('Build Maven Project') {
+        stage('Build Maven') {
             steps {
-                echo 'Building Maven project...'
                 sh 'mvn clean package'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                echo 'Building Docker image...'
-                sh 'docker build -t maven-app-image .'
+                sh 'docker build -t app-image .'
             }
         }
 
-        stage('Run Docker Container') {
+        stage('Deploy Container') {
             steps {
-                echo 'Running Docker container...'
-
                 sh '''
-                docker stop maven-app || true
-                docker rm maven-app || true
-                docker run -d --name maven-app -p 8081:8080 maven-app-image
+                docker stop app-container || true
+                docker rm app-container || true
+                docker run -d --name app-container -p 80:8080 app-image
                 '''
             }
         }
     }
+}pipeline {
+    agent any
 
-    post {
-        success {
-            echo '✅ Pipeline SUCCESS'
+    stages {
+
+        stage('Checkout Code') {
+            steps {
+                git 'https://github.com/ayeshactl/jenkins-demo.git'
+            }
         }
-        failure {
-            echo '❌ Pipeline FAILED'
+
+        stage('Build Maven') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t app-image .'
+            }
+        }
+
+        stage('Deploy Container') {
+            steps {
+                sh '''
+                docker stop app-container || true
+                docker rm app-container || true
+                docker run -d --name app-container -p 80:8080 app-image
+                '''
+            }
         }
     }
 }
